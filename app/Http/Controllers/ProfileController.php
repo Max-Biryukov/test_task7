@@ -61,46 +61,20 @@ class ProfileController extends Controller
         ], $messages);
 
         $fileData = $request->has( 'avatar' ) ? $request->file('avatar' ) : [] ;
-
-        if( !empty($fileData) ){
-
-            $newFileName = str_random( 45 );
-            $originalFileName = $fileData->getClientOriginalName();
-            $extention = substr( $originalFileName, strrpos($originalFileName, '.') );
-
-            $avatar = \App\Models\File::create([
-                'filename' => $newFileName . $extention,
-                'realname' => $originalFileName,
-            ]);
-
-            if( !empty($avatar->id) ){
-
-                $photo = \File::get( $fileData );
-                $smallfile = \Image::make( $photo )->resize( 100, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $mediumFile = \Image::make( $photo )->resize( 250, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-
-                \Storage::disk( 'files' )->put( $avatar->id . DIRECTORY_SEPARATOR . 'original_' . $newFileName . $extention, $photo );
-                \Storage::disk( 'files' )->put( $avatar->id . DIRECTORY_SEPARATOR . 'small_' . $newFileName . $extention, $smallfile->stream() );
-                \Storage::disk( 'files' )->put( $avatar->id . DIRECTORY_SEPARATOR . 'medium_' . $newFileName . $extention, $mediumFile->stream() );
-            }
-        }
+        $fileId = FileController::saveFile( $fileData );
 
         $user = \Auth::user();
         $user->name = trim( strip_tags($request->name) );
         $user->about = trim( strip_tags($request->about) );
 
-        if( !empty($avatar->id) ){
+        if( !empty($fileId) ){
 
             if( !empty($user->avatar_id) ){
                 \Storage::disk( 'files' )->deleteDirectory( $user->avatar_id );
                 $user->avatar->delete();
             }
 
-            $user->avatar_id = $avatar->id;
+            $user->avatar_id = $fileId;
         }
 
         if( $user->save() ){

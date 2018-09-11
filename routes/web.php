@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get( '/', 'AdController@index' )->name( 'main_page' );
 
 Auth::routes();
 
@@ -21,6 +19,7 @@ Route::get( '/home', 'HomeController@index' )->name( 'home' );
 Route::get( '/files/{id}/{type?}', 'FileController@show' )->name( 'show_file' );
 
 Route::resource( 'profile', 'ProfileController' )->only( ['index', 'show', 'edit', 'update'] )->middleware( 'auth' );
+Route::resource( 'ads', 'AdController' )->middleware( 'auth' );
 /*
 Route::get('profile', [
   'middleware' => 'auth',
