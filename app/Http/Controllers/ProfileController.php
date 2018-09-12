@@ -14,15 +14,6 @@ class ProfileController extends Controller
         2 => '2 звезды',
         1 => '1 звезда',
     ];
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Display the specified resource.

@@ -16,7 +16,7 @@ class AddFilesTable extends Migration
         Schema::create('files', function (Blueprint $table) {
 
             $table->increments( 'id' );
-            $table->string( 'filename', 55 );
+            $table->string( 'filename', 15 );
             $table->string( 'realname' );
             $table->timestamps();
 

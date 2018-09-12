@@ -17,8 +17,8 @@ Auth::routes();
 
 Route::get( '/files/{id}/{type?}', 'FileController@show' )->name( 'show_file' );
 
-Route::resource( 'profile', 'ProfileController' )->only( ['index', 'show', 'edit', 'update'] )->middleware( 'auth' );
+Route::resource( 'profile', 'ProfileController' )->only( ['show', 'edit', 'update'] )->middleware( 'auth' );
 Route::post( 'profile/add-comment/{id}', 'ProfileController@addComment' )->middleware( 'auth' )->name( 'profile.add_comment' );
 Route::post( 'profile/add-rating/{id}', 'ProfileController@addRating' )->middleware( 'auth' )->name( 'profile.add_rating' );
 
-Route::resource( 'ads', 'AdController' )->middleware( 'auth' );
+Route::resource( 'ads', 'AdController' )->only( ['index', 'create', 'store'] )->middleware( 'auth' );

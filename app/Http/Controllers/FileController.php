@@ -32,7 +32,7 @@ class FileController extends Controller
     public static function saveFile( $fileData )
     {
         if( !empty($fileData) ){
-            $newFileName = str_random( 45 );
+            $newFileName = str_random( 5 );
             $originalFileName = $fileData->getClientOriginalName();
             $extention = substr( $originalFileName, strrpos($originalFileName, '.') );
 
