@@ -17,46 +17,80 @@
                                     <img src="{{ route( 'show_file', [ $user->avatar_id, 'medium' ] ) }}" />
                                 </div>
                             @endif
-                            <div style="text-align: justify;">
-                                {{ $ad->text }}
+                            <div style="text-align: center;">
+                                {{ $user->name }}
                             </div>
-                            <div style="text-align: left; font-size: 12px; font-style:italic">
-                                Добавлено пользователем: <a target="_blank" href="{{ route('profile.show', $ad->user_id) }}">{{ $ad->user->name }}</a>
-                            </div>
+
                         </div>
 
-                        <form action="{{ route( 'profile.update', \Auth::id() ) }}" method="post" enctype="multipart/form-data" >
-                            <table class="table table-bordered" style="width: 70%; margin: 0 auto">
-                                <tr>
-                                    <td>Аватар</td>
-                                    <td>
-                                        @if( !empty($user->avatar_id) )
-                                            <img src="{{ route( 'show_file', [ $user->avatar_id, 'small' ] ) }}" />
-                                        @endif
-                                        <input type="file" name="avatar">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Имя*</td>
-                                    <td>
-                                        <input style="width: 95%" type="text" name="name" value="{{ $user->name }}">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Обо мне</td>
-                                    <td>
-                                        <textarea name="about" style="width: 95%">{{ $user->about }}</textarea>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: right">
-                                        {{ method_field( 'PATCH' ) }}
-                                        {{ csrf_field() }}
-                                        <input type="submit" value="Сохранить">
-                                    </td>
-                                </tr>
-                            </table>
-                        </form>
+                        <table class="table table-bordered" style="width: 90%; margin: 0 auto">
+                            <tr>
+                                <td>
+                                    @if( $user->id != \Auth::user()->id )
+                                        <form action="{{ route( 'profile.add_comment', $user->id ) }}" method="post" >
+                                            <textarea name="comment" style="width: 95%"></textarea>
+                                            {{ csrf_field() }}
+                                            <input type="submit" value="Добавить комментарий">
+                                        </form>
+                                    @endif
+                                    @foreach( $user->profileComments as $author )
+
+                                        <div style="margin: 8px 0 ">
+                                            @if( !empty($author->avatar_id) )
+                                                <div style="float:left">
+                                                    <img src="{{ route( 'show_file', [ $author->avatar_id, 'small' ] ) }}" />
+                                                </div>
+                                            @endif
+                                            <div>
+                                                {{ $author->name }} {{ $author->pivot->created_at }}:<br>
+                                                <b>{{ $author->pivot->comment }}</b>
+                                            </div>
+                                            <div style="clear: both" ></div>
+                                        </div>
+
+                                    @endforeach
+
+                                </td>
+                                <td>
+                                    @if( !empty($rating) && $user->id != \Auth::user()->id )
+                                        <form action="{{ route( 'profile.add_rating', $user->id ) }}" method="post" >
+                                            <div class="star-rating">
+                                                <div class="star-rating__wrap">
+
+                                                    @foreach( $rating as $key => $value )
+
+                                                        <input class="star-rating__input" id="star-rating-{{ $key }}" type="radio" name="rating" value="{{ $key }}" @if( $ratingForProfile == $key ) checked="checked" @endif >
+                                                        <label class="star-rating__ico fa fa-star-o fa-lg" for="star-rating-{{ $key }}" title="{{ $value }}"></label>
+
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            {{ csrf_field() }}
+                                            <input type="submit" value="@if( $ratingForProfile == 0 ) Задать рейтинг @else Изменить рейтинг @endif">
+                                        </form>
+                                    @endif
+
+                                    @foreach( $user->profileRating as $author )
+
+                                        <div style="margin: 8px 0 ">
+                                            @if( !empty($author->avatar_id) )
+                                                <div style="float:left">
+                                                    <img src="{{ route( 'show_file', [ $author->avatar_id, 'small' ] ) }}" />
+                                                </div>
+                                            @endif
+                                            <div>
+                                                {{ $author->name }} {{ $author->pivot->created_at }}:<br>
+                                                Поставил оценку <b>{{ $author->pivot->rating }}</b>
+                                            </div>
+                                            <div style="clear: both" ></div>
+                                        </div>
+
+                                    @endforeach
+
+                                </td>
+                            </tr>
+                        </table>
+
                     </div>
                 </div>
             </div>
@@ -65,4 +99,38 @@
         <div>Пользователь не определен</div>
     @endif
 </div>
+@endsection
+
+@section( 'css' )
+    .star-rating{
+        font-size: 0;
+        text-align: center;
+    }
+    .star-rating__wrap{
+        display: inline-block;
+        font-size: 2rem;
+    }
+    .star-rating__wrap:after{
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .star-rating__ico{
+        float: right;
+        padding-left: 2px;
+        cursor: pointer;
+        color: #FFB300;
+    }
+    .star-rating__ico:last-child{
+        padding-left: 0;
+    }
+    .star-rating__input{
+        display: none;
+    }
+    .star-rating__ico:hover:before,
+    .star-rating__ico:hover ~ .star-rating__ico:before,
+    .star-rating__input:checked ~ .star-rating__ico:before
+    {
+        content: "\f005";
+    }
 @endsection

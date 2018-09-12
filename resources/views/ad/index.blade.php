@@ -23,7 +23,7 @@
                                     {{ $ad->text }}
                                 </div>
                                 <div style="text-align: left; font-size: 12px; font-style:italic">
-                                    Добавлено пользователем: <a target="_blank" href="{{ route('profile.show', $ad->user_id) }}">{{ $ad->user->name }}</a>
+                                    Добавлено пользователем: <a target="_blank" href="{{ route('profile.show', $ad->user_id) }}">{{ $ad->user->name }}</a> {{ $ad->created_at }}
                                 </div>
                             </div>
                         @endforeach

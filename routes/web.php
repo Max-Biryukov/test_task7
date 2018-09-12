@@ -15,13 +15,10 @@ Route::get( '/', 'AdController@index' )->name( 'main_page' );
 
 Auth::routes();
 
-Route::get( '/home', 'HomeController@index' )->name( 'home' );
 Route::get( '/files/{id}/{type?}', 'FileController@show' )->name( 'show_file' );
 
 Route::resource( 'profile', 'ProfileController' )->only( ['index', 'show', 'edit', 'update'] )->middleware( 'auth' );
+Route::post( 'profile/add-comment/{id}', 'ProfileController@addComment' )->middleware( 'auth' )->name( 'profile.add_comment' );
+Route::post( 'profile/add-rating/{id}', 'ProfileController@addRating' )->middleware( 'auth' )->name( 'profile.add_rating' );
+
 Route::resource( 'ads', 'AdController' )->middleware( 'auth' );
-/*
-Route::get('profile', [
-  'middleware' => 'auth',
-  'uses' => 'ProfileController@show'
-]);*/

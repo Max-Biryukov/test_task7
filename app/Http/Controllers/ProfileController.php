@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
+
+    private $_rating = [
+        5 => '5 звезд',
+        4 => '4 звезды',
+        3 => '3 звезды',
+        2 => '2 звезды',
+        1 => '1 звезда',
+    ];
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +32,19 @@ class ProfileController extends Controller
      */
     public function show( $id )
     {
-        dd('12');
+        $user = \App\user::findOrFail( (int) $id );
+        $authUser = \Auth::user();
+        $rating = 0;
+
+        if( $mark = $authUser->userRating($user->id)->first() ){
+            $rating = $mark->pivot->rating;
+        }
+
+        return view( 'profile.show', [
+            'user' => $user,
+            'rating' => $this->_rating,
+            'ratingForProfile' => $rating,
+        ]);
     }
 
     /**
@@ -82,6 +102,48 @@ class ProfileController extends Controller
         }
 
         return redirect( route('profile.edit', $user->id) );
+    }
+
+    public function addComment( Request $request, $id )
+    {
+        $currentUser = \Auth::user();
+        $profileId = (int) $id;
+        if( $profileId > 0 && $profileId != $currentUser->id ){
+            $currentUser->userComments()->attach([
+                $profileId => [
+                    'comment' => trim( strip_tags($request->comment) ),
+                ]
+            ]);
+
+            \Session::flash( 'message', 'Комментарий добавлен' );
+        }
+
+        return redirect( route('profile.show', $id) );
+    }
+
+    public function addRating( Request $request, $id )
+    {
+        if(
+            $request->has('rating') &&
+            ( $rating = (int) $request->rating )&&
+            $rating > 0 &&
+            $rating <= 5
+        ){
+
+            $currentUser = \Auth::user();
+            $profileId = (int) $id;
+            if( $profileId > 0 && $profileId != $currentUser->id ){
+                $currentUser->userRating()->sync([
+                    $profileId => [
+                        'rating' => $rating,
+                    ]
+                ]);
+            }
+
+            \Session::flash( 'message', 'Оценка добавлена' );
+        }
+
+        return redirect( route('profile.show', $id) );
     }
 
 }

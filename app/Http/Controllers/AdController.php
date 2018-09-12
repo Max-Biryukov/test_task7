@@ -8,6 +8,9 @@ use App\Http\Controllers\FileController;
 
 class AdController extends Controller
 {
+
+    const ADS_PER_PAGE = 20;
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +19,7 @@ class AdController extends Controller
     public function index()
     {
         return view( 'ad.index',[
-            'ads' => Ad::paginate( 2 )
+            'ads' => Ad::orderBy( 'id', 'desc' )->paginate( self::ADS_PER_PAGE )
         ]);
     }
 
